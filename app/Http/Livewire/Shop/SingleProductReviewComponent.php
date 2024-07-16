@@ -32,7 +32,7 @@ class SingleProductReviewComponent extends Component
             $this->canRate = true;
         }
 
-        if(auth()->user()){
+        if (auth()->user()) {
             $rating = Review::where('user_id', auth()->id())->where('product_id', $this->product->id)->first();
 
             if (!empty($rating)) {
@@ -53,7 +53,7 @@ class SingleProductReviewComponent extends Component
 
     public function rate(Request $request)
     {
-        if (!$this->checkProduct){
+        if (!$this->checkProduct) {
             $this->alert('error', 'You must buy this item first');
             return false;
         }
@@ -70,7 +70,7 @@ class SingleProductReviewComponent extends Component
             $rating->status = 1;
             $rating->save();
         } else {
-            if ($rating->status == 'Inactive'){
+            if ($rating->status == 'Inactive') {
                 $this->alert('error', 'already rating this item');
                 return false;
             }

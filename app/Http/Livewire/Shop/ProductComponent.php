@@ -51,15 +51,13 @@ class ProductComponent extends Component
                 $products = $products->whereHas('category', function ($query) use ($categoriesIds) {
                     $query->whereIn('id', $categoriesIds);
                 });
-
             } else {
                 $products = $products->with('category')
                     ->whereHas('category', function ($query) {
-                    $query->where([
-                        'slug' => $this->slug,
-                    ]);
-                });
-
+                        $query->where([
+                            'slug' => $this->slug,
+                        ]);
+                    });
             }
         }
 

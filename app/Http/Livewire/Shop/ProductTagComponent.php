@@ -43,8 +43,8 @@ class ProductTagComponent extends Component
                 'slug' => $this->slug,
             ]);
         })
-        ->orderBy($sortField, $sortType)
-        ->paginate($this->paginationLimit);
+            ->orderBy($sortField, $sortType)
+            ->paginate($this->paginationLimit);
 
         return view('livewire.shop.product-component', compact('products'));
     }

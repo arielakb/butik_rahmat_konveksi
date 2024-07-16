@@ -44,7 +44,7 @@ Route::get('payments/completed', [\App\Http\Controllers\PaymentController::class
 Route::get('payments/failed', [\App\Http\Controllers\PaymentController::class, 'failed'])->name('payment.failed');
 Route::get('payments/unfinish', [\App\Http\Controllers\PaymentController::class, 'unfinish'])->name('payment.unfinish');
 
-Route::get('text', function() {
+Route::get('text', function () {
     return view('frontend.payments.success');
 });
 
@@ -55,11 +55,18 @@ Route::get('shop/{slug?}', [\App\Http\Controllers\ShopController::class, 'index'
 Route::get('shop/tag/{slug}', [\App\Http\Controllers\ShopController::class, 'tag'])->name('shop.tag');
 Route::get('product/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('product.show');
 
-Route::resource('favorite', \App\Http\Controllers\FavoriteController::class)->only(['index','store','destroy']);
-Route::resource('cart', \App\Http\Controllers\CartController::class)->only(['index','store','update', 'destroy']);
+// Route::resource('favorite', \App\Http\Controllers\FavoriteController::class)->only(['index','store','destroy']);
+Route::get('favorite', [\App\Http\Controllers\FavoriteController::class, 'index'])->name('favorite.index');
+Route::post('favorite', [\App\Http\Controllers\FavoriteController::class, 'store'])->name('favorite.store');
+Route::delete('favorite', [\App\Http\Controllers\FavoriteController::class, 'destroy'])->name('favorite.destroy');
+// Route::resource('cart', \App\Http\Controllers\CartController::class)->only(['index','store','update', 'destroy']);
+Route::get('cart', [\App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+Route::post('cart', [\App\Http\Controllers\CartController::class, 'store'])->name('cart.store');
+Route::patch('cart', [\App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
+Route::delete('cart', [\App\Http\Controllers\CartController::class, 'destroy'])->name('cart.destroy');
 
 
-Route::group(['middleware' => 'auth'], function() {
+Route::group(['middleware' => 'auth'], function () {
 
     Route::get('profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -86,114 +93,113 @@ Route::group(['middleware' => 'auth'], function() {
     // // })->middleware('auth');
 
 
-Route::group(['middleware' => 'isAdmin','prefix' => 'admin', 'as' => 'admin.'], function() {
+    Route::group(['middleware' => 'isAdmin', 'prefix' => 'admin', 'as' => 'admin.'], function () {
 
-    Route::get('dashboard', 'DashboardController@index')->name('admin.index');
-
-
-
-    // ROLES
-    Route::resource('roles', 'RoleController');
-    Route::resource('permissions', 'PermissionController');
-    Route::resource('users', 'UserController');
+        Route::get('dashboard', 'DashboardController@index')->name('admin.index');
 
 
-    Route::get('/logout', 'Auth\LoginController@logout');
 
-    // CRUD ORDERAN //
-    Route::get('/input_orderan', 'OrderController@index');
-    Route::POST('/input_orderan', 'OrderController@store');
-    Route::get('/lihat_orderan', 'OrderController@lihat_orderan');
-    Route::get('/lihat_orderan/detail/{id}', 'OrderController@show');
-    Route::get('/edit_orderan/{id}', 'OrderController@edit');
-    Route::PATCH('/edit_orderan/{id}', 'OrderController@update');
-
-    //CRUD STOK BARANG //
-    Route::get('/stok', 'StokController@index');
-    Route::get('/show_stok/{id}', 'StokController@show');
-    Route::get('/print_stok/{nama_loker}', 'StokController@print_stok');
-
-    //CRUD STOK BAHAN BAKU //
-    Route::get('/stok_bahan_baku', 'StokBahanBakuController@index');
-    Route::get('/show_stok_bahan_baku/{id}', 'StokBahanBakuController@show_stok_bahan_baku');
-    Route::get('/print_stok_bahan_baku/{nama_loker_bahan}', 'StokBahanBakuController@print_stok_bahan_baku');
-
-    //CRUD MASTER DATA STOK BARANG//
-    Route::get('/master_stok', 'MasterDataController@master_stok');
-    Route::get('/lihat_stok/{nama_loker}', 'MasterDataController@show_stok');
-    Route::POST('/input_master_stok', 'MasterDataController@input_master_stok');
-    Route::get('/edit_stok/{id}', 'MasterDataController@edit_stok');
-    Route::PATCH('/edit_stok/{id}', 'MasterDataController@update_stok');
-    Route::get('/hapus_stok/{id}', 'MasterDataController@destroy_stok');
-
-    //CRUD MASTER DATA STOK BAHAN BAKU//
-    Route::get('/master_stok_bahan_baku', 'MasterDataController@master_stok_bahan_baku');
-    Route::get('/lihat_stok_bahan_baku/{nama_loker_bahan}', 'MasterDataController@show_stok_bahan_baku');
-    Route::POST('/input_master_stok_bahan_baku', 'MasterDataController@input_master_stok_bahan_baku');
-    Route::get('/edit_stok_bahan_baku/{id}', 'MasterDataController@edit_stok_bahan_baku');
-    Route::PATCH('/edit_stok_bahan_baku/{id}', 'MasterDataController@update_stok_bahan_baku');
-    Route::get('/hapus_stok_bahan_baku/{id}', 'MasterDataController@destroy_stok_bahan_baku');
-
-    //CRUD MASTER DATA ORDERAN
-    Route::get('/master_orderan', 'MasterDataController@master_orderan');
-    Route::get('/orderan/hapus_orderan/{id}', 'MasterDataController@destroy_orderan');
-
-    //CRUD MASTER DATA ACCOUNT
-    Route::get('/master_akun', 'MasterDataController@master_akun');
-    Route::get('/master_akun/edit/{id}', 'MasterDataController@edit_akun');
-    Route::get('/master_akun/hapus_akun/{id}', 'MasterDataController@destroy_akun');
-    Route::PATCH('/master_akun/update/{id}', 'MasterDataController@update_akun');
-    Route::PATCH('/master_akun/update_pw/{id}', 'MasterDataController@update_pw');
-    Route::post('/master_akun/add', 'MasterDataController@add_akun');
-
-    //CRUD MASTER DATA SUPPLIER
-    Route::get('/master_supplier', 'MasterDataController@master_supplier');
-    Route::get('/master_supplier/edit/{id}', 'MasterDataController@edit_supplier');
-    Route::get('/master_supplier/hapus_supplier/{id}', 'MasterDataController@destroy_supplier');
-    Route::PATCH('/master_supplier/update/{id}', 'MasterDataController@update_supplier');
-    Route::post('/master_supplier/add', 'MasterDataController@add_supplier');
+        // ROLES
+        Route::resource('roles', 'RoleController');
+        Route::resource('permissions', 'PermissionController');
+        Route::resource('users', 'UserController');
 
 
-    //CRUD MASTER DATA PEGAWAI
-    Route::get('/master_pegawai', 'MasterDataController@master_pegawai');
-    Route::get('/master_pegawai/edit/{id}', 'MasterDataController@edit_pegawai');
-    Route::get('/master_pegawai/hapus_pegawai/{id}', 'MasterDataController@destroy_pegawai');
-    Route::PATCH('/master_pegawai/update/{id}', 'MasterDataController@update_pegawai');
-    Route::post('/master_pegawai/add', 'MasterDataController@add_pegawai');
+        Route::get('/logout', 'Auth\LoginController@logout');
+
+        // CRUD ORDERAN //
+        Route::get('/input_orderan', 'OrderController@index');
+        Route::POST('/input_orderan', 'OrderController@store');
+        Route::get('/lihat_orderan', 'OrderController@lihat_orderan');
+        Route::get('/lihat_orderan/detail/{id}', 'OrderController@show');
+        Route::get('/edit_orderan/{id}', 'OrderController@edit');
+        Route::PATCH('/edit_orderan/{id}', 'OrderController@update');
+
+        //CRUD STOK BARANG //
+        Route::get('/stok', 'StokController@index');
+        Route::get('/show_stok/{id}', 'StokController@show');
+        Route::get('/print_stok/{nama_loker}', 'StokController@print_stok');
+
+        //CRUD STOK BAHAN BAKU //
+        Route::get('/stok_bahan_baku', 'StokBahanBakuController@index');
+        Route::get('/show_stok_bahan_baku/{id}', 'StokBahanBakuController@show_stok_bahan_baku');
+        Route::get('/print_stok_bahan_baku/{nama_loker_bahan}', 'StokBahanBakuController@print_stok_bahan_baku');
+
+        //CRUD MASTER DATA STOK BARANG//
+        Route::get('/master_stok', 'MasterDataController@master_stok');
+        Route::get('/lihat_stok/{nama_loker}', 'MasterDataController@show_stok');
+        Route::POST('/input_master_stok', 'MasterDataController@input_master_stok');
+        Route::get('/edit_stok/{id}', 'MasterDataController@edit_stok');
+        Route::PATCH('/edit_stok/{id}', 'MasterDataController@update_stok');
+        Route::get('/hapus_stok/{id}', 'MasterDataController@destroy_stok');
+
+        //CRUD MASTER DATA STOK BAHAN BAKU//
+        Route::get('/master_stok_bahan_baku', 'MasterDataController@master_stok_bahan_baku');
+        Route::get('/lihat_stok_bahan_baku/{nama_loker_bahan}', 'MasterDataController@show_stok_bahan_baku');
+        Route::POST('/input_master_stok_bahan_baku', 'MasterDataController@input_master_stok_bahan_baku');
+        Route::get('/edit_stok_bahan_baku/{id}', 'MasterDataController@edit_stok_bahan_baku');
+        Route::PATCH('/edit_stok_bahan_baku/{id}', 'MasterDataController@update_stok_bahan_baku');
+        Route::get('/hapus_stok_bahan_baku/{id}', 'MasterDataController@destroy_stok_bahan_baku');
+
+        //CRUD MASTER DATA ORDERAN
+        Route::get('/master_orderan', 'MasterDataController@master_orderan');
+        Route::get('/orderan/hapus_orderan/{id}', 'MasterDataController@destroy_orderan');
+
+        //CRUD MASTER DATA ACCOUNT
+        Route::get('/master_akun', 'MasterDataController@master_akun');
+        Route::get('/master_akun/edit/{id}', 'MasterDataController@edit_akun');
+        Route::get('/master_akun/hapus_akun/{id}', 'MasterDataController@destroy_akun');
+        Route::PATCH('/master_akun/update/{id}', 'MasterDataController@update_akun');
+        Route::PATCH('/master_akun/update_pw/{id}', 'MasterDataController@update_pw');
+        Route::post('/master_akun/add', 'MasterDataController@add_akun');
+
+        //CRUD MASTER DATA SUPPLIER
+        Route::get('/master_supplier', 'MasterDataController@master_supplier');
+        Route::get('/master_supplier/edit/{id}', 'MasterDataController@edit_supplier');
+        Route::get('/master_supplier/hapus_supplier/{id}', 'MasterDataController@destroy_supplier');
+        Route::PATCH('/master_supplier/update/{id}', 'MasterDataController@update_supplier');
+        Route::post('/master_supplier/add', 'MasterDataController@add_supplier');
 
 
-    //ORDERAN BELUM DI PROSES
-    Route::get('/orderan/belum_proses', 'OrderController@belum_proses');
+        //CRUD MASTER DATA PEGAWAI
+        Route::get('/master_pegawai', 'MasterDataController@master_pegawai');
+        Route::get('/master_pegawai/edit/{id}', 'MasterDataController@edit_pegawai');
+        Route::get('/master_pegawai/hapus_pegawai/{id}', 'MasterDataController@destroy_pegawai');
+        Route::PATCH('/master_pegawai/update/{id}', 'MasterDataController@update_pegawai');
+        Route::post('/master_pegawai/add', 'MasterDataController@add_pegawai');
 
-    //ORDERAN MULAI PRODUKSI
-    Route::get('/on_proses', 'OrderController@on_proses');
-    Route::get('/orderan/mulai_produksi/{id}', 'OrderController@mulai_produksi');
 
-    //ORDERAN SIAP KIRIM //
-    Route::get('/orderan/selesai_produksi/{id}', 'OrderController@selesai_produksi');
-    Route::get('/siap_kirim', 'OrderController@siap_kirim');
+        //ORDERAN BELUM DI PROSES
+        Route::get('/orderan/belum_proses', 'OrderController@belum_proses');
 
-    // ORDERAN SELESAI //
-    Route::get('/orderan/selesai_produksi', 'OrderController@selesai_produksi');
-    Route::get('/orderan_selesai', 'OrderController@orderan_selesai');
+        //ORDERAN MULAI PRODUKSI
+        Route::get('/on_proses', 'OrderController@on_proses');
+        Route::get('/orderan/mulai_produksi/{id}', 'OrderController@mulai_produksi');
 
-    //CETAK INVOICE
-    Route::get('/orderan/cetak_invoice/{id}', 'OrderController@cetak_invoice');
+        //ORDERAN SIAP KIRIM //
+        Route::get('/orderan/selesai_produksi/{id}', 'OrderController@selesai_produksi');
+        Route::get('/siap_kirim', 'OrderController@siap_kirim');
 
-    //OMSET BULANAN
-    Route::get('/omset_bulanan', 'OmsetContoller@index');
-    Route::POST('/omset_bulanan', 'OmsetContoller@cari_omset');
-    //OMSET TAHUNAN
-    Route::get('/omset_tahunan', 'OmsetContoller@omset_tahunan');
-    Route::POST('/omset_tahunan', 'OmsetContoller@cari_omset_tahunan');
+        // ORDERAN SELESAI //
+        Route::get('/orderan/selesai_produksi', 'OrderController@selesai_produksi');
+        Route::get('/orderan_selesai', 'OrderController@orderan_selesai');
 
-    // PROFILE
-    // Route::get('/profile/{id}', 'AkunController@index');
-    // Route::PATCH('/update_profile/{id}', 'AkunController@update');
-    // Route::PATCH('/update_profile/update_pw/{id}', 'AkunController@update_pw');
+        //CETAK INVOICE
+        Route::get('/orderan/cetak_invoice/{id}', 'OrderController@cetak_invoice');
 
-});
+        //OMSET BULANAN
+        Route::get('/omset_bulanan', 'OmsetContoller@index');
+        Route::POST('/omset_bulanan', 'OmsetContoller@cari_omset');
+        //OMSET TAHUNAN
+        Route::get('/omset_tahunan', 'OmsetContoller@omset_tahunan');
+        Route::POST('/omset_tahunan', 'OmsetContoller@cari_omset_tahunan');
 
+        // PROFILE
+        // Route::get('/profile/{id}', 'AkunController@index');
+        // Route::PATCH('/update_profile/{id}', 'AkunController@update');
+        // Route::PATCH('/update_profile/update_pw/{id}', 'AkunController@update_pw');
+
+    });
 });
 
 Auth::routes();
